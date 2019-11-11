@@ -36,7 +36,6 @@ int Tree::Insert_Node (Node* node1, Node* node_new, int pos)
                  Expected 0 for left or 1 for right. Received %d.", pos);
         return -1;
     }
-printf ("data = %s, left = %0x, right = %p\n", node1->data, node1->left, node1->right);
     this->elem_num += 1;
 
     return 0;
@@ -57,7 +56,7 @@ int Tree::Insert_Node (Node* node_new)
     return -1;
 }
 
-int Tree::Tree_Dump (void)
+int Tree::Dump (void)
 {
     char* file_name = (char*) calloc (FILE_NAME_SIZE, sizeof (char));
     char* file_png = (char*) calloc (FILE_NAME_SIZE, sizeof (char));
@@ -148,4 +147,49 @@ void Tree::Tree_Info_Dump (const Node* node1, FILE* f)
         Tree_Info_Dump (node1->right, f);
     }
 
+}
+
+int Tree::Akinator (void)
+{
+    printf ("Hello there! Let's play a game!\n");
+
+    char* answer = (char*)calloc (1, ANSWER_SIZE);
+
+    printf ("Your answer is:\n%s\n", Akinator_Cycle (this->first_elem, answer));
+
+    return 0;
+}
+
+elem_t Tree::Akinator_Cycle (Node* node1, char* answer)
+{
+    printf ("%s\n", node1->data);
+    if (node1->left == 0 && node1->right == 0)
+        return (char*)node1->data;
+
+    scanf ("%s", answer);
+    if (!strcmp (answer,"Yes"))
+    {
+        if (node1->right)
+            Akinator_Cycle (node1->right, answer);
+        else
+        {
+            printf ("Oops. You can't go there. Please, use other answer.\n");
+            Akinator_Cycle (node1, answer);
+        }
+    }
+    else if (!strcmp (answer, "No"))
+    {
+        if (node1->left)
+            Akinator_Cycle (node1->left, answer);
+        else
+        {
+            printf ("Oops. You can't go there. Please, use other answer.\n");
+            Akinator_Cycle (node1, answer);
+        }
+    }
+    else
+    {
+        printf ("Invalid answer! Please, use \"Yes\" or \"No\" instead of %s.\n", answer);
+        Akinator_Cycle (node1, answer);
+    }
 }
