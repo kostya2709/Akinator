@@ -21,7 +21,7 @@ Tree::~Tree()
     free (this->first_elem);
 }
 
-int Tree::Insert_Node (Node* node_new, Node* node1, int pos)
+int Tree::Insert_Node (Node* node1, Node* node_new, int pos)
 {
     assert (node_new);
     assert (node1);
@@ -36,7 +36,7 @@ int Tree::Insert_Node (Node* node_new, Node* node1, int pos)
                  Expected 0 for left or 1 for right. Received %d.", pos);
         return -1;
     }
-
+printf ("data = %s, left = %0x, right = %p\n", node1->data, node1->left, node1->right);
     this->elem_num += 1;
 
     return 0;
@@ -57,3 +57,95 @@ int Tree::Insert_Node (Node* node_new)
     return -1;
 }
 
+int Tree::Tree_Dump (void)
+{
+    char* file_name = (char*) calloc (FILE_NAME_SIZE, sizeof (char));
+    char* file_png = (char*) calloc (FILE_NAME_SIZE, sizeof (char));
+
+
+    file_name = "tree_print.gv";
+    file_png = "tree_print.png";
+
+    FILE* f = fopen (file_name, "w");
+
+
+    fprintf (f, "digraph First{\n");
+    fprintf (f, "node [shape=\"Mrecord\", style=\"filled\", fillcolor=\"lightblue\"];\n");
+
+    Tree_Print (this->first_elem, f);
+
+    fprintf (f, "}");
+
+    fclose (f);
+
+    system ("dot -Tpng tree_print.gv -o tree_print.png");
+
+
+    file_name = "tree_dump.gv";
+    file_png = "tree_dump.png";
+
+    f = fopen (file_name, "w");
+
+    fprintf (f, "digraph First{\n");
+    fprintf (f, "node [shape=\"Mrecord\", style=\"filled\", fillcolor=\"lightblue\"];\n");
+
+    Tree_Info_Dump(this->first_elem, f);
+
+    fprintf (f, "}");
+
+    fclose (f);
+
+    system ("dot -Tpng tree_dump.gv -o tree_dump.png");
+
+    system ("pause");
+
+    return 0;
+}
+
+void Tree::Tree_Print (const Node* node1, FILE* f)
+{
+    if (node1 == this->first_elem)
+        fprintf (f, "\"box%0x\" [label=\"%s\"];\n", node1, node1->data);
+
+    if (node1->left)
+        {
+            fprintf (f, "\"box%0x\" [label=\"%s\"];\n", node1->left, (node1->left)->data);
+            fprintf (f, "\"box%0x\" -> \"box%0x\"[label=\"No\", color=\"red\"];\n", node1, node1->left);
+
+            Tree_Print (node1->left, f);
+        }
+
+
+    if (node1->right)
+    {
+        fprintf (f, "\"box%0x\" [label=\"%s\"];\n", node1->right, (node1->right)->data);
+        fprintf (f, "\"box%0x\" -> \"box%0x\"[label=\"Yes\", color=\"green\"];\n", node1, node1->right);
+
+        Tree_Print (node1->right, f);
+    }
+
+}
+
+void Tree::Tree_Info_Dump (const Node* node1, FILE* f)
+{
+    if (node1 == this->first_elem)
+        fprintf (f, "\"box%0x\" [label=\"{%s|adress=%0x|left=%0x|right=%0x}\"];\n", node1, node1->data, node1, node1->left, node1->right);
+
+    if (node1->left)
+        {
+            fprintf (f, "\"box%0x\" [label=\"{%s|adress %0x|left=%0x|right=%0x}\"];\n", node1->left, (node1->left)->data, node1->left, (node1->left)->left, (node1->left)->right);
+            fprintf (f, "\"box%0x\" -> \"box%0x\"[label=\"No\", color=\"red\"];\n", node1, node1->left);
+
+            Tree_Info_Dump (node1->left, f);
+        }
+
+
+    if (node1->right)
+    {
+        fprintf (f, "\"box%0x\" [label=\"{%s|adress=%0x|left=%0x|right=%0x}\"];\n", node1->right, (node1->right)->data, node1->right, (node1->right)->left, (node1->right)->right);
+        fprintf (f, "\"box%0x\" -> \"box%0x\"[label=\"Yes\", color=\"green\"];\n", node1, node1->right);
+
+        Tree_Info_Dump (node1->right, f);
+    }
+
+}
