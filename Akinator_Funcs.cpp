@@ -196,30 +196,78 @@ elem_t Tree::Akinator_Cycle (Node* node1, char* answer)
 
 int Tree::File_Write (FILE* f)
 {
-    fprintf (f, "{");
-    (*this).File_Write_Cycle (this->first_elem, f);
+    fprintf (f, "{\n");
+    (*this).File_Write_Cycle (this->first_elem, f, 1);
     fprintf (f, "}");
+
+    return 0;
 }
 
-int Tree::File_Write_Cycle (Node* node1, FILE* f)
+void Tree::File_Write_Cycle (Node* node1, FILE* f, int number)
 {
-    fprintf (f, "%s", node1->data);
+    Insert_Tabs (f, number);
+    fprintf (f, "\"%s\"", node1->data);
 
-    fprintf (f, "{");
-    if (!node1->left)
-        fprintf (f, "nill");
+    if ((node1->left)->Is_Leaf())
+    {
+        fprintf (f, "\n");
+        Insert_Tabs (f, number);
+        fprintf (f, "{\n");
+        Insert_Tabs (f, number + 1);
+        fprintf (f, "%s {}", node1->left->data);
+    }
     else
     {
-        File_Write_Cycle (node1->left, f);
+        fprintf (f, "\n");
+        Insert_Tabs (f, number);
+        fprintf (f, "{\n");
+        File_Write_Cycle (node1->left, f, number + 1);
     }
 
-    fprintf (f, " ");
+    fprintf (f, "\n");
 
-    if (!node1->right)
-        fprintf (f, "nill");
-    else
+    if ((node1->right)->Is_Leaf())
     {
-        File_Write_Cycle (node1->right, f);
+        Insert_Tabs (f, number + 1);
+        fprintf (f, "%s {}\n", node1->right->data);
     }
-    fprintf (f, "}");
+    else
+        File_Write_Cycle (node1->right, f, number + 1);
+
+    Insert_Tabs(f, number);
+    fprintf (f, "}\n");
+}
+
+Tree* Tree::File_Read (FILE* f)
+{
+    char* string = (char*)calloc(1, 1024);
+    fread (string, 1, 1024, f);
+    printf ("%s\n", string);
+
+    Tree read_list;
+
+    char* str_temp = string;
+    char* cur_str = (char*)calloc(1, ANSWER_SIZE);
+
+    char brace = '}';
+    int letter_num = 0;
+    sscanf (str_temp, "%c", &brace);
+    str_temp++;
+    sscanf (str_temp, "%[^{,}] %n", cur_str, &letter_num);
+    printf ("brace = %c, str = %s, letter_num=%d\n", brace, cur_str, letter_num);
+}
+
+void Tree::Insert_Tabs (FILE* f, int number)
+{
+    int i = 0;
+    for (i = 0; i < number; i++)
+        fprintf (f, "\t");
+}
+
+int Node::Is_Leaf (void)
+{
+    if ((this->left == 0) && (this->right == 0))
+        return 1;
+
+    return 0;
 }

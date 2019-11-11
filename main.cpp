@@ -6,7 +6,7 @@ int main()
 {
 
     Node node1;
-    node1.data = "Are you from Europe?";
+    node1.data = "You are from Europe";
 
     Node node2;
     node2.data = "2";
@@ -21,7 +21,7 @@ int main()
     node5.data = "5";
 
     Node node6;
-    node6.data = "Your blood is a tomato sauce, your nerves are pasta?";
+    node6.data = "Your blood is a tomato sauce, your nerves are pasta";
 
     Node node7;
     node7.data = "You are from Italy!";
@@ -73,8 +73,12 @@ int main()
     //akin_tree.Insert_Node (&node7, &node14, 0);
     //akin_tree.Insert_Node (&node7, &node15, 1);
 
-    FILE* file_w = fopen ("Europe guide.txt", "w");
-    akin_tree.File_Write(file_w);
+    FILE* file_r = fopen ("Europe guide.txt", "w");
+    akin_tree.File_Write(file_r);
+    fclose (file_r);
+
+    FILE* file_w = fopen ("Europe guide.txt", "r");
+    akin_tree.File_Read(file_w);
     fclose (file_w);
 
     akin_tree.Dump();

@@ -22,6 +22,9 @@ public:
 
     Node();
 
+    /*!Returns 1 if the node is the leaf of the tree, else returns 0*/
+    int Is_Leaf (void);
+
     ~Node();
 
 };
@@ -61,6 +64,9 @@ public:
     /*!This function writes the information about the tree into the file f*/
     int File_Write (FILE* f);
 
+    /*!This function reads the information about the tree from the file f*/
+    Tree* File_Read (FILE* f);
+
     ~Tree();
 
 private:
@@ -70,9 +76,12 @@ private:
     /*! An auxiliary function. Prints info about a tree to a GV file.*/
     void Tree_Info_Dump (const Node* node1, FILE* f);
 
-    /*! An auxiliary function for Akinator*/
+    /*! An auxiliary function for Akinator.*/
     elem_t Akinator_Cycle (Node* node1, char* answer);
 
-    /*!An auxiliary function for File_Write*/
-    int File_Write_Cycle (Node* node1, FILE* f);
+    /*!An auxiliary function for File_Write.*/
+    void File_Write_Cycle (Node* node1, FILE* f, int number);
+
+    /*!An auxiliary function to insert tabs into txt file.*/
+    void Insert_Tabs (FILE* f, int number);
 };
