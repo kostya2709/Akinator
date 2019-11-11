@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 typedef char* elem_t;
@@ -7,6 +8,8 @@ typedef char* elem_t;
 const int data_size = 20;
 
 const int FILE_NAME_SIZE = 100;
+
+const int ANSWER_SIZE = 30;
 
 struct Node
 {
@@ -49,8 +52,14 @@ public:
     */
     int Insert_Node (Node* node_new);
 
-    /*! This function display all tree's nodes and edges in tree_dump.png.*/
-    int Tree_Dump (void);
+    /*! This function displays all tree's nodes and edges in tree_dump.png.*/
+    int Dump (void);
+
+    /*! The Akinator game itself*/
+    int Akinator (void);
+
+    /*!This function writes the information about the tree into the file f*/
+    int File_Write (FILE* f);
 
     ~Tree();
 
@@ -60,5 +69,10 @@ private:
 
     /*! An auxiliary function. Prints info about a tree to a GV file.*/
     void Tree_Info_Dump (const Node* node1, FILE* f);
-};
 
+    /*! An auxiliary function for Akinator*/
+    elem_t Akinator_Cycle (Node* node1, char* answer);
+
+    /*!An auxiliary function for File_Write*/
+    int File_Write_Cycle (Node* node1, FILE* f);
+};

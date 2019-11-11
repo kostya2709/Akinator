@@ -151,11 +151,11 @@ void Tree::Tree_Info_Dump (const Node* node1, FILE* f)
 
 int Tree::Akinator (void)
 {
-    printf ("Hello there! Let's play a game!\n");
+    printf ("Hello there! Let's play a game!\nI wonder, where you are from?\n");
 
     char* answer = (char*)calloc (1, ANSWER_SIZE);
 
-    printf ("Your answer is:\n%s\n", Akinator_Cycle (this->first_elem, answer));
+    Akinator_Cycle (this->first_elem, answer);
 
     return 0;
 }
@@ -192,4 +192,34 @@ elem_t Tree::Akinator_Cycle (Node* node1, char* answer)
         printf ("Invalid answer! Please, use \"Yes\" or \"No\" instead of %s.\n", answer);
         Akinator_Cycle (node1, answer);
     }
+}
+
+int Tree::File_Write (FILE* f)
+{
+    fprintf (f, "{");
+    (*this).File_Write_Cycle (this->first_elem, f);
+    fprintf (f, "}");
+}
+
+int Tree::File_Write_Cycle (Node* node1, FILE* f)
+{
+    fprintf (f, "%s", node1->data);
+
+    fprintf (f, "{");
+    if (!node1->left)
+        fprintf (f, "nill");
+    else
+    {
+        File_Write_Cycle (node1->left, f);
+    }
+
+    fprintf (f, " ");
+
+    if (!node1->right)
+        fprintf (f, "nill");
+    else
+    {
+        File_Write_Cycle (node1->right, f);
+    }
+    fprintf (f, "}");
 }
