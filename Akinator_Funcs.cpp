@@ -1,5 +1,7 @@
 #include "Akinator_Head.h"
 
+char* cur_ptr = (char*)&data_size;
+
 Node::Node(): left (NULL), right (NULL)
 {
     this->data = (elem_t)calloc (data_size, sizeof (elem_t));
@@ -151,7 +153,7 @@ void Tree::Tree_Info_Dump (const Node* node1, FILE* f)
 
 int Tree::Akinator (void)
 {
-    printf ("Hello there! Let's play a game!\nI wonder, where you are from?\n");
+    printf ("Привет! Поиграем? Загадай кого-нибудь. Спорим, я угадаю? \n");
 
     char* answer = (char*)calloc (1, ANSWER_SIZE);
 
@@ -194,67 +196,111 @@ elem_t Tree::Akinator_Cycle (Node* node1, char* answer)
     }
 }
 
-int Tree::File_Write (FILE* f)
+int Tree::File_Write (char* file_name)
 {
-    fprintf (f, "{\n");
+    FILE* f = fopen (file_name, "w");
+
     (*this).File_Write_Cycle (this->first_elem, f, 1);
-    fprintf (f, "}");
+
+    fclose (f);
 
     return 0;
 }
 
 void Tree::File_Write_Cycle (Node* node1, FILE* f, int number)
 {
+    Insert_Tabs (f, number - 1);
+    fprintf (f, "{\n");
     Insert_Tabs (f, number);
     fprintf (f, "\"%s\"", node1->data);
-
-    if ((node1->left)->Is_Leaf())
-    {
-        fprintf (f, "\n");
-        Insert_Tabs (f, number);
-        fprintf (f, "{\n");
-        Insert_Tabs (f, number + 1);
-        fprintf (f, "%s {}", node1->left->data);
-    }
-    else
-    {
-        fprintf (f, "\n");
-        Insert_Tabs (f, number);
-        fprintf (f, "{\n");
-        File_Write_Cycle (node1->left, f, number + 1);
-    }
-
     fprintf (f, "\n");
 
-    if ((node1->right)->Is_Leaf())
+    if ((node1->left == 0) && (node1->right))
     {
         Insert_Tabs (f, number + 1);
-        fprintf (f, "%s {}\n", node1->right->data);
+        fprintf (f, "$\n");
     }
-    else
+    else if (node1->left)
+        File_Write_Cycle (node1->left, f, number + 1);
+
+
+    if ((node1->right == 0) && (node1->left))
+    {
+        Insert_Tabs (f, number + 1);
+        fprintf (f, "$\n");
+    }
+    else if (node1->right)
         File_Write_Cycle (node1->right, f, number + 1);
 
-    Insert_Tabs(f, number);
-    fprintf (f, "}\n");
+    Insert_Tabs (f, number - 1);
+    fprintf (f, "}\n");;
 }
 
-Tree* Tree::File_Read (FILE* f)
+int Tree::File_Read (char* file_name)
 {
-    char* string = (char*)calloc(1, 1024);
-    fread (string, 1, 1024, f);
-    printf ("%s\n", string);
+    FILE* f = fopen (file_name, "r");
 
-    Tree read_list;
+    char* string = (char*)calloc(1, ANSWER_STR);
+    fread (string, 1, ANSWER_STR, f);
 
-    char* str_temp = string;
-    char* cur_str = (char*)calloc(1, ANSWER_SIZE);
+    cur_ptr = Delete_Str_Trash(string);
+    free (string);
 
-    char brace = '}';
     int letter_num = 0;
-    sscanf (str_temp, "%c", &brace);
-    str_temp++;
-    sscanf (str_temp, "%[^{,}] %n", cur_str, &letter_num);
-    printf ("brace = %c, str = %s, letter_num=%d\n", brace, cur_str, letter_num);
+
+    Node* node0 = new Node();
+    this->first_elem = node0;
+
+    File_Read_Cycle (this->first_elem);
+    fclose (f);
+
+    return 0;
+
+}
+
+
+
+void Tree::File_Read_Cycle (Node* node1)
+{
+    if (*cur_ptr == '\0')
+        return;
+
+    int letter_num = 0;
+
+    cur_ptr += 2;                   ///Skips a brace and quotes.
+
+    sscanf (cur_ptr, "%[^\"] %n", node1->data, &letter_num);
+
+    cur_ptr += letter_num + 1;      ///Skips the string and quotes.
+
+    if (*cur_ptr == '$')
+        ;
+    else if (*cur_ptr == '}')
+    {
+        return;
+    }
+    else
+    {
+        Node* node_left = new Node();
+        node1->left = node_left;
+        File_Read_Cycle(node_left);
+    }
+
+        cur_ptr++;
+
+        if (*cur_ptr == '$')
+            ;
+        else if (*cur_ptr == '}')
+            return;
+        else
+        {
+            Node* node_right = new Node();
+            node1->right = node_right;
+            File_Read_Cycle(node_right);
+        }
+        if (*cur_ptr == '}')
+            cur_ptr++;
+
 }
 
 void Tree::Insert_Tabs (FILE* f, int number)
@@ -270,4 +316,32 @@ int Node::Is_Leaf (void)
         return 1;
 
     return 0;
+}
+
+char* Delete_Str_Trash (char* str)
+{
+    char* new_str = (char*) calloc (1, strlen (str));
+
+    char* start = new_str;
+
+    int in_quotes = 0;
+
+    while (*str)
+    {
+        if (*str == '\"')
+            if (in_quotes == 0)
+                in_quotes = 1;
+            else in_quotes = 0;
+
+        if (((*str == ' ') || (*str =='\t') || (*str == '\n'))&& in_quotes == 0)
+            ;
+        else
+        {
+            *new_str = *str;
+            new_str++;
+        }
+        str++;
+    }
+
+    return start;
 }

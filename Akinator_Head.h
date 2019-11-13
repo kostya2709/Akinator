@@ -11,6 +11,8 @@ const int FILE_NAME_SIZE = 100;
 
 const int ANSWER_SIZE = 30;
 
+const int ANSWER_STR = 1024;
+
 struct Node
 {
 public:
@@ -62,10 +64,10 @@ public:
     int Akinator (void);
 
     /*!This function writes the information about the tree into the file f*/
-    int File_Write (FILE* f);
+    int File_Write (char* file_name);
 
     /*!This function reads the information about the tree from the file f*/
-    Tree* File_Read (FILE* f);
+    int File_Read (char* file_name);
 
     ~Tree();
 
@@ -82,6 +84,11 @@ private:
     /*!An auxiliary function for File_Write.*/
     void File_Write_Cycle (Node* node1, FILE* f, int number);
 
+    /*!An auxiliary function for File_Read.*/
+    void File_Read_Cycle (Node* node1);
+
     /*!An auxiliary function to insert tabs into txt file.*/
     void Insert_Tabs (FILE* f, int number);
 };
+
+char* Delete_Str_Trash (char* str);
