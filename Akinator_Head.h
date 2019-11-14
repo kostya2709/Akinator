@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <iostream>
 
 typedef char* elem_t;
 
@@ -9,7 +10,7 @@ const int data_size = 20;
 
 const int FILE_NAME_SIZE = 100;
 
-const int ANSWER_SIZE = 30;
+const int ANSWER_SIZE = 100;
 
 const int ANSWER_STR = 1024;
 
@@ -69,6 +70,9 @@ public:
     /*!This function reads the information about the tree from the file f*/
     int File_Read (char* file_name);
 
+    /*!This function return the path to the node with data name.*/
+    int Find_Character (char* name);
+
     ~Tree();
 
 private:
@@ -79,7 +83,7 @@ private:
     void Tree_Info_Dump (const Node* node1, FILE* f);
 
     /*! An auxiliary function for Akinator.*/
-    elem_t Akinator_Cycle (Node* node1, char* answer);
+    Node* Akinator_Cycle (Node* node1, char* answer);
 
     /*!An auxiliary function for File_Write.*/
     void File_Write_Cycle (Node* node1, FILE* f, int number);
@@ -92,3 +96,7 @@ private:
 };
 
 char* Delete_Str_Trash (char* str);
+
+int Add_Character (Node* node1);
+
+int Find_Character_Cycle (Node* node1, char* name, int path, int* end);

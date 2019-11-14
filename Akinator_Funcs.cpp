@@ -153,20 +153,54 @@ void Tree::Tree_Info_Dump (const Node* node1, FILE* f)
 
 int Tree::Akinator (void)
 {
-    printf ("Привет! Поиграем? Загадай кого-нибудь. Спорим, я угадаю? \n");
+    //printf ("Привет! Поиграем? Загадай кого-нибудь. Спорим, я угадаю? \n");
+
+    char* akin_str = (char*)calloc (1, ANSWER_SIZE);
+    strcpy(akin_str,"Hello! Let's play a game! Choose somebody, a will guess him!\n");
+    printf ("%s", akin_str);
+    char* pattern = (char*)calloc (1, ANSWER_SIZE);
+    strcpy (pattern, "cd C:\\Program Files\\eSpeak NG");
+    system (pattern);
+    strcpy (pattern, "espeak-ng hello");
+    char* entire_str = (char*)calloc (1, ANSWER_SIZE);
+    //strcat (strcpy (entire_str, pattern), akin_str);
+    //printf ("entire = %s\n", entire_str);
+    system (pattern);
 
     char* answer = (char*)calloc (1, ANSWER_SIZE);
 
-    Akinator_Cycle (this->first_elem, answer);
+    Node* ans_node = Akinator_Cycle (this->first_elem, answer);
+
+    printf ("It seems that your character is %s. I am right, yes?\n", ans_node->data);
+
+    scanf ("%s", answer);
+
+    while ((strcmp (answer, "Yes") && strcmp (answer, "No")))
+    {
+        printf ("What? I do not really understand you. Use only \"Yes\" and \"No\"! ");
+        scanf ("%s", answer);
+    }
+    if (strcmp (answer, "Yes") == 0)
+        printf ("I have never lost!\n");
+    else if (strcmp (answer, "No") == 0)
+    {
+        Add_Character (ans_node);
+        this->File_Write ("Кто есть кто.txt");
+        this->Dump();
+    }
+
+    free (pattern);
+    free (entire_str);
+    free (akin_str);
 
     return 0;
 }
 
-elem_t Tree::Akinator_Cycle (Node* node1, char* answer)
+Node* Tree::Akinator_Cycle (Node* node1, char* answer)
 {
-    printf ("%s\n", node1->data);
     if (node1->left == 0 && node1->right == 0)
-        return (char*)node1->data;
+        return node1;
+    printf ("%s?\n", node1->data);
 
     scanf ("%s", answer);
     if (!strcmp (answer,"Yes"))
@@ -344,4 +378,56 @@ char* Delete_Str_Trash (char* str)
     }
 
     return start;
+}
+
+
+int Add_Character (Node* node1)
+{
+    assert (node1);
+
+    char* new_ans = (char*)calloc (1, ANSWER_SIZE);
+    char* distinguish = (char*) calloc (1, ANSWER_SIZE);
+
+    printf ("Hmm...Strange...OK, tell me, who it is?\n");
+    gets (new_ans);     //To kill some trash
+    gets (new_ans);
+
+    printf ("Alright, what is the difference between %s and %s?\n", node1->data, new_ans);
+
+    gets (distinguish);
+
+    printf ("Fine. I remember it.\n");
+
+    Node* new_node_yes = new Node();
+    new_node_yes->data = new_ans;
+    Node* new_node_no = new Node();
+    new_node_no->data = node1->data;
+
+    node1->data = distinguish;
+    node1->left = new_node_no;
+    node1->right = new_node_yes;
+
+    return 0;
+}
+
+int Tree::Find_Character (char* name)
+{
+    int path = 0;
+    Find_Character_Cycle (this->first_elem, name, 1, &path);
+    return path;
+}
+
+int Find_Character_Cycle (Node* node1, char* name, int path, int* end)
+{
+    if (strcmp (node1->data, name) == 0)
+    {
+        *end = path;
+        return 0;
+    }
+
+    if (node1->left)
+        Find_Character_Cycle (node1->left, name, 10 * path, end);
+
+    if (node1->right)
+        Find_Character_Cycle (node1->right, name, 10 * path + 1, end);
 }
